@@ -1,0 +1,6 @@
+{
+    "@@locale": "ru",
+    "loginTitle": "Вход",
+    "loginHint": "Введите имя пользователя",
+    "loginButton": "Войти"
+}

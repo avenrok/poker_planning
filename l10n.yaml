@@ -1,0 +1,8 @@
+# Директория, где расположены ваши ARB-файлы
+arb-dir: lib/l10n
+# Имя основного (базового) ARB-файла
+template-arb-file: ru.arb
+# Имя генерируемого файла с локализациями
+output-localization-file: app_localizations.dart
+# Имя класса для доступа к локализациям
+output-class: AppLocalizations

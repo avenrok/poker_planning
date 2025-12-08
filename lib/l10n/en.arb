@@ -1,0 +1,6 @@
+{
+    "@@locale": "en",
+    "loginTitle": "Login",
+    "loginHint": "Enter username",
+    "loginButton": "Log In"
+}

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:poker_planning/data/menu_model.dart';
 import 'package:poker_planning/view/login.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => null,
+      create: (context) => MenuModel(),
       child: const LoginView()
       )
     );
