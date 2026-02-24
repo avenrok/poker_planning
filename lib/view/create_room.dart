@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poker_planning/bloc/auth/auth_bloc.dart';
 import 'package:poker_planning/bloc/rooms/rooms_bloc.dart';
 import 'package:poker_planning/env/env_config.dart';
 import 'package:poker_planning/data/utils/network_helper.dart';
@@ -120,7 +122,13 @@ class _CreateRoomViewState extends State<CreateRoomView> {
                               IconButton(
                                 icon: const Icon(Icons.copy),
                                 onPressed: () {
-                                  // Копировать URL
+                                  Clipboard.setData(ClipboardData(text: _localIpUrl!));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('URL скопирован'),
+                                      duration: Duration(seconds: 1),
+                                    ),
+                                  );
                                 },
                               ),
                             ],
@@ -166,25 +174,24 @@ class _CreateRoomViewState extends State<CreateRoomView> {
   }
 
   void _createRoom() {
-    // Отправляем событие создания комнаты
+  if (_formKey.currentState!.validate()) {
+    final authState = context.read<AuthBloc>().state;
+    final userId = authState.user?.id ?? 'guest';
+    final userName = authState.user?.userName ?? 'Guest';
+    
     context.read<RoomsBloc>().add(
       CreateRoomEvent(
         name: _nameController.text,
         description: _descriptionController.text,
         localUrl: _localIpUrl,
-      ),
-    );
-    
-    // Показываем сообщение об успехе и возвращаемся
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Комната успешно создана'),
-        backgroundColor: Colors.green,
+        userId: userId,       
+        userName: userName,    
       ),
     );
     
     Navigator.of(context).pop();
   }
+}
 
   @override
   void dispose() {

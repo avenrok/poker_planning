@@ -3,16 +3,20 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poker_planning/data/models/room.dart';
 import 'package:poker_planning/data/repositories/room_repository.dart';
+import 'package:poker_planning/bloc/auth/auth_bloc.dart';
 
 part 'rooms_event.dart';
 part 'rooms_state.dart';
 
 class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
   final RoomRepository _roomRepository;
+  final AuthBloc _authBloc;
   Timer? _pollingTimer;
 
-  RoomsBloc({required RoomRepository roomRepository})
+  RoomsBloc({required RoomRepository roomRepository,
+            required AuthBloc authBloc,})
       : _roomRepository = roomRepository,
+      _authBloc = authBloc,
         super(const RoomsState()) {
     on<LoadRoomsEvent>(_onLoadRooms);
     on<LoadRoomEvent>(_onLoadRoom);
@@ -25,7 +29,7 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
   }
 
   // Загрузка всех комнат пользователя
-  Future<void> _onLoadRooms(
+   Future<void> _onLoadRooms(
     LoadRoomsEvent event,
     Emitter<RoomsState> emit,
   ) async {
@@ -35,10 +39,13 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
       final rooms = await _roomRepository.getUserRooms();
       print('RoomsBloc: Loaded ${rooms.length} rooms');
       
-      // Разделяем на созданные и посещаемые комнаты
-      final myRooms = rooms.where((r) => r.creatorId == 'currentUserId').toList();
-      final joinedRooms = rooms.where((r) => r.creatorId != 'currentUserId').toList();
-
+      // Получаем реальный ID пользователя из AuthBloc
+      final currentUserId = _getCurrentUserId();
+      print('RoomsBloc: Current user ID = $currentUserId');
+      
+      final myRooms = rooms.where((r) => r.creatorId == currentUserId).toList();
+      final joinedRooms = rooms.where((r) => r.creatorId != currentUserId).toList();
+      
       print('RoomsBloc: myRooms = ${myRooms.length}, joinedRooms = ${joinedRooms.length}');
       
       emit(state.copyWith(
@@ -47,12 +54,20 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
         joinedRooms: joinedRooms,
       ));
     } catch (e) {
-       print('RoomsBloc: Error loading rooms: $e');
+      print('RoomsBloc: Error loading rooms: $e');
       emit(state.copyWith(
         status: RoomsStatus.error,
         errorMessage: e.toString(),
       ));
     }
+  }
+
+  String _getCurrentUserId() {
+    final authState = _authBloc.state;
+    if (authState.status == AuthStatus.authenticated && authState.user != null) {
+      return authState.user!.id;
+    }
+    return 'current_user'; // fallback
   }
 
   // Загрузка конкретной комнаты по ID (просмотр)
@@ -89,6 +104,8 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
       name: event.name,
       description: event.description,
       localUrl: event.localUrl,
+      userId: event.userId,
+      userName: event.userName
     );
     
     print('Room created: ${newRoom.name}');

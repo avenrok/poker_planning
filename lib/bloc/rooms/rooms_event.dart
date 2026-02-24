@@ -27,15 +27,19 @@ class CreateRoomEvent extends RoomsEvent {
   final String name;
   final String? description;
   final String? localUrl;
+  final String userId;      
+  final String userName;    
 
   const CreateRoomEvent({
     required this.name,
     this.description,
     this.localUrl,
+    required this.userId,      
+    required this.userName,  
   });
 
   @override
-  List<Object> get props => [name];
+  List<Object> get props => [name, userId];
 }
 
 // Присоединение к комнате

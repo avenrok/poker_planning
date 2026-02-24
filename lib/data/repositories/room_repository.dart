@@ -33,6 +33,8 @@ class RoomRepository {
     required String name,
     String? description,
     String? localUrl,
+    required String userId,
+    required String userName,
   }) async {
     try {
       print('Creating room: $name');
@@ -40,6 +42,8 @@ class RoomRepository {
         'name': name,
         'description': description,
         'localUrl': localUrl,
+        'userId': userId,
+        'userName': userName,
       });
       print('Create room response: ${response.data}');
       return Room.fromJson(response.data);

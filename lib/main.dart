@@ -9,7 +9,7 @@ import 'package:poker_planning/data/repositories/room_repository.dart';
 import 'package:poker_planning/data/repositories/voting_repository.dart';
 import 'package:poker_planning/data/services/api_service.dart';
 import 'package:poker_planning/view/login.dart';
-import 'package:poker_planning/view/menu.dart'; 
+import 'package:poker_planning/view/menu.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,10 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Инициализация сервисов
     final apiService = ApiService();
-    
-    // Инициализация репозиториев
     final authRepository = AuthRepository(apiService);
     final roomRepository = RoomRepository(apiService);
     final votingRepository = VotingRepository(apiService);
@@ -33,10 +30,13 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(authRepository: authRepository),
+          create: (context) => AuthBloc(authRepository: authRepository)..add(AuthCheckStatus()),
         ),
         BlocProvider<RoomsBloc>(
-          create: (context) => RoomsBloc(roomRepository: roomRepository),
+          create: (context) => RoomsBloc(
+            roomRepository: roomRepository,
+            authBloc: context.read<AuthBloc>(), // Передаем AuthBloc
+          ),
         ),
         BlocProvider<VotingBloc>(
           create: (context) => VotingBloc(votingRepository: votingRepository),
