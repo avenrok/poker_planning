@@ -266,7 +266,7 @@ class ProfileTab extends StatelessWidget {
                                             ],
                                           ),
                                         );
-                                      }).toList(),
+                                      }),
                                       if (voting.finalResult != null) ...[
                                         const Divider(height: 24),
                                         Row(

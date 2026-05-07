@@ -63,3 +63,30 @@
 //   }
 // }
 //  Можно его использовать,если дописать сервер через Websoket, пока что нет времени с ним разбираться
+
+import 'dart:convert';
+
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+class SocketService {
+  late WebSocketChannel channel;
+
+  void connect(String roomId) {
+    channel = WebSocketChannel.connect(
+      Uri.parse(
+        'ws://192.168.1.10:8080/ws/$roomId',
+      ),
+    );
+  }
+
+  void sendVote(String value) {
+    channel.sink.add(
+      jsonEncode({
+        'type': 'vote',
+        'value': value,
+      }),
+    );
+  }
+
+  Stream get stream => channel.stream;
+}

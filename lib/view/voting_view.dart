@@ -446,7 +446,7 @@ class _VotingViewState extends State<VotingView> {
               ),
             ),
           );
-        }).toList(),
+        }),
         
         if (voting.status == models.VotingStatus.active)
           Padding(
